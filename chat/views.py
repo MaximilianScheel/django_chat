@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from .models import Chat, Message
 from django.contrib.auth import authenticate, login
 from django.http.response import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -18,7 +19,7 @@ def index(request): # request is an HttpRequest object
 
 
 def login_view(request):
-    redirect = request.GET.get('next') # get the next parameter from the url
+    redirect = request.GET.get('next', '/chat') # get the next parameter from the url
     if request.method == 'POST':
         user = authenticate(username=request.POST['username'], password=request.POST['password'])
         
@@ -28,3 +29,17 @@ def login_view(request):
         else: 
             return render(request, 'auth/login.html', {'wrongPassword': True, 'redirect': redirect})
     return render(request, 'auth/login.html', {'redirect': redirect})
+
+
+def register_view(request):
+    if request.method == 'POST':
+        if request.POST['password'] == request.POST['password2']:
+            try:
+                user = User.objects.create_user(request.POST['username'], password=request.POST['password'])
+                login(request, user)
+                return HttpResponseRedirect('/login')
+            except:
+                return render(request, 'auth/register.html', {'error': 'Username already exists'})
+        else:
+            return render(request, 'auth/register.html', {'error': 'Passwords do not match'})
+    return render(request, 'auth/register.html')
