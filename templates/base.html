@@ -24,6 +24,8 @@
           {% else %}
             <span>Django Chat</span>
           {% endif %}
+
+        </span>
             
         <!-- Add spacer, to align navigation to the right -->
         <div class="mdl-layout-spacer"></div>
@@ -33,10 +35,7 @@
     <div class="mdl-layout__drawer">
       <span class="mdl-layout-title">Chatroom</span>
       <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" href="">Link</a>
-        <a class="mdl-navigation__link" href="">Link</a>
-        <a class="mdl-navigation__link" href="">Link</a>
-        <a class="mdl-navigation__link" href="">Link</a>
+        <span><a href="{% url 'logout' %}">Logout</a></span>
       </nav>
     </div>
   

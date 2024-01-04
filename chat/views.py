@@ -1,9 +1,12 @@
+from django.http import JsonResponse
+from django.core import serializers
 from django.shortcuts import redirect, render
 from .models import Chat, Message
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http.response import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+
 
 # Create your views here.
 
@@ -12,7 +15,9 @@ def index(request): # request is an HttpRequest object
     if request.method == 'POST': # If the form has been submitted as post
         print(request.POST['textmessage']) # print the textmessage
         myChat = Chat.objects.get(id=1) # get the chat with id 1
-        Message.objects.create(text=request.POST['textmessage'], chat=myChat, author=request.user, receiver=request.user) # create a message with the textmessage, the chat with id 1, the author and the receiver
+        new_message = Message.objects.create(text=request.POST['textmessage'], chat=myChat, author=request.user, receiver=request.user) # create a message with the textmessage, the chat with id 1, the author and the receiver
+        serialized_obj = serializers.serialize('json', [ new_message, ]) # serialize the message
+        return JsonResponse(serialized_obj[1:-1], safe=False) # return a json response with success true
     chatMessages = Message.objects.filter(chat__id=1) # get the messages with chat id 1
     return render(request, 'chat/index.html', {'messages': chatMessages}) # render the index.html template with the messages
 
@@ -43,3 +48,9 @@ def register_view(request):
         else:
             return render(request, 'auth/register.html', {'error': 'Passwords do not match'})
     return render(request, 'auth/register.html')
+
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
